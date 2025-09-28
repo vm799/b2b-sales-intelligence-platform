@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2B Sales Intelligence Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .results h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            border-color: #667eea;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .score-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .score-high { background: #48bb78; }
+        .score-medium { background: #ed8936; }
+        .score-low { background: #f56565; }
+        .score-very-low { background: #a0aec0; }
+
+        .lead-info {
+            flex: 1;
+        }
+
+        .lead-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .lead-company {
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .insights {
+            background: #f7fafc;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .insights h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .insight-item {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-block;
+            margin: 3px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 B2B Sales Intelligence Platform</h1>
+            <p>Deterministic job analysis for enterprise sales teams</p>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <h2>📊 Single Lead Analysis</h2>
+                <form id="singleLeadForm">
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title</label>
+                        <input type="text" id="jobTitle" placeholder="e.g. Chief Executive Officer" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" placeholder="e.g. TechCorp Inc" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="employees">Company Size (Employees)</label>
+                        <input type="number" id="employees" placeholder="e.g. 1500" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="industry">Industry</label>
+                        <select id="industry" required>
+                            <option value="">Select Industry</option>
+                            <option value="technology">Technology</option>
+                            <option value="software">Software</option>
+                            <option value="saas">SaaS</option>
+                            <option value="finance">Finance</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="manufacturing">Manufacturing</option>
+                            <option value="retail">Retail</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" placeholder="e.g. San Francisco, CA">
+                    </div>
+                    
+                    <button type="submit" class="btn">Analyze Lead</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>📁 Batch Analysis</h2>
+                <div class="form-group">
+                    <label for="csvFile">Upload CSV File</label>
+                    <input type="file" id="csvFile" accept=".csv" />
+                    <p style="font-size: 12px; color: #718096; margin-top: 5px;">
+                        CSV should have columns: jobTitle, companyName, employees, industry, location
+                    </p>
+                </div>
+                
+                <button id="batchAnalyzeBtn" class="btn" disabled>Analyze Batch</button>
+                
+                <div style="margin-top: 20px;">
+                    <h3>Sample Data</h3>
+                    <button id="sampleDataBtn" class="btn" style="margin-top: 10px;">Load Sample Data</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="results" id="resultsSection" style="display: none;">
+            <h2>📈 Analysis Results</h2>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        class SalesIntelligencePlatform {
+            constructor() {
+                this.apiBaseURL = '/api';
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                document.getElementById('singleLeadForm').addEventListener('submit', this.handleSingleLeadAnalysis.bind(this));
+                document.getElementById('csvFile').addEventListener('change', this.handleFileSelect.bind(this));
+                document.getElementById('batchAnalyzeBtn').addEventListener('click', this.handleBatchAnalysis.bind(this));
+                document.getElementById('sampleDataBtn').addEventListener('click', this.loadSampleData.bind(this));
+            }
+
+            async handleSingleLeadAnalysis(event) {
+                event.preventDefault();
+                
+                const formData = {
+                    job: {
+                        title: document.getElementById('jobTitle').value,
+                        company: document.getElementById('companyName').value
+                    },
+                    company: {
+                        name: document.getElementById('companyName').value,
+                        employees: parseInt(document.getElementById('employees').value),
+                        industry: document.getElementById('industry').value,
+                        location: document.getElementById('location').value
+                    }
+                };
+
+                this.showLoading();
+                
+                try {
+                    const response = await fetch(`${this.apiBaseURL}/analyze-lead`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.displaySingleResult(result.data);
+                    } else {
+                        this.showError('Analysis failed: ' + (result.error || 'Unknown error'));
+                    }
+                } catch (error) {
+                    this.showError('Network error: ' + error.message);
+                }
+            }
+
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                const batchBtn = document.getElementById('batchAnalyzeBtn');
+                
+                if (file) {
+                    batchBtn.disabled = false;
+                    this.csvFile = file;
+                } else {
+                    batchBtn.disabled = true;
+                    this.csvFile = null;
+                }
+            }
+
+            async handleBatchAnalysis() {
+                if (!this.csvFile && !this.sampleData) {
+                    this.showError('Please select a CSV file or load sample data');
+                    return;
+                }
+
+                this.showLoading();
+
+                try {
+                    let leads;
+                    
+                    if (this.sampleData) {
+                        leads = this.sampleData;
+                    } else {
+                        leads = await this.parseCSV(this.csvFile);
+                    }
+
+                    const response = await fetch(`${this.apiBaseURL}/batch-analyze`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ leads })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.displayBatchResults(result.results);
+                    } else {
+                        this.showError('Batch analysis failed: ' + (result.error || 'Unknown error'));
+                    }
+                } catch (error) {
+                    this.showError('Error during batch analysis: ' + error.message);
+                }
+            }
+
+            async parseCSV(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const csv = e.target.result;
+                            const lines = csv.split('\n');
+                            const headers = lines[0].split(',').map(h => h.trim());
+                            
+                            const leads = lines.slice(1).filter(line => line.trim()).map((line, index) => {
+                                const values = line.split(',').map(v => v.trim());
+                                return {
+                                    id: `csv-${index}`,
+                                    job: {
+                                        title: values[0] || '',
+                                        company: values[1] || ''
+                                    },
+                                    company: {
+                                        name: values[1] || '',
+                                        employees: parseInt(values[2]) || 0,
+                                        industry: values[3] || '',
+                                        location: values[4] || ''
+                                    }
+                                };
+                            });
+                            
+                            resolve(leads);
+                        } catch (error) {
+                            reject(new Error('Failed to parse CSV file'));
+                        }
+                    };
+                    reader.readAsText(file);
+                });
+            }
+
+            loadSampleData() {
+                this.sampleData = [
+                    {
+                        id: 'sample-1',
+                        job: { title: 'Chief Executive Officer', company: 'TechCorp Inc' },
+                        company: { name: 'TechCorp Inc', employees: 1500, industry: 'technology', location: 'San Francisco, CA' }
+                    },
+                    {
+                        id: 'sample-2',
+                        job: { title: 'Sales Director', company: 'StartupXYZ' },
+                        company: { name: 'StartupXYZ', employees: 25, industry: 'saas', location: 'Austin, TX' }
+                    },
+                    {
+                        id: 'sample-3',
+                        job: { title: 'Marketing Manager', company: 'MegaCorp' },
+                        company: { name: 'MegaCorp', employees: 5000, industry: 'manufacturing', location: 'Detroit, MI' }
+                    },
+                    {
+                        id: 'sample-4',
+                        job: { title: 'Junior Developer', company: 'DevShop' },
+                        company: { name: 'DevShop', employees: 8, industry: 'software', location: 'Portland, OR' }
+                    }
+                ];
+
+                document.getElementById('batchAnalyzeBtn').disabled = false;
+                this.showSuccess('Sample data loaded successfully! Click "Analyze Batch" to process.');
+            }
+
+            displaySingleResult(analysis) {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsContent = document.getElementById('resultsContent');
+                
+                resultsContent.innerHTML = this.createResultHTML(analysis, 'single');
+                resultsSection.style.display = 'block';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            displayBatchResults(results) {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsContent = document.getElementById('resultsContent');
+                
+                const successful = results.filter(r => r.success);
+                const failed = results.filter(r => !r.success);
+                
+                let html = `
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${results.length}</div>
+                            <div class="stat-label">Total Processed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${successful.length}</div>
+                            <div class="stat-label">Successful</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${failed.length}</div>
+                            <div class="stat-label">Failed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${successful.length > 0 ? Math.round(successful.reduce((sum, r) => sum + r.analysis.totalScore, 0) / successful.length) : 0}</div>
+                            <div class="stat-label">Avg Score</div>
+                        </div>
+                    </div>
+                `;
+                
+                successful.sort((a, b) => b.analysis.totalScore - a.analysis.totalScore);
+                
+                successful.forEach(result => {
+                    html += this.createResultHTML(result.analysis, 'batch', result.id);
+                });
+                
+                resultsContent.innerHTML = html;
+                resultsSection.style.display = 'block';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            createResultHTML(analysis, type, id = '') {
+                const scoreClass = `score-${analysis.priority.replace('_', '-')}`;
+                
+                return `
+                    <div class="result-item">
+                        <div class="score-display">
+                            <div class="score-circle ${scoreClass}">
+                                ${analysis.totalScore}
+                            </div>
+                            <div class="lead-info">
+                                <div class="lead-title">${analysis.jobAnalysis.level.replace('_', ' ').toUpperCase()} - ${analysis.jobAnalysis.department.toUpperCase()}</div>
+                                <div class="lead-company">
+                                    ${analysis.companyAnalysis.tier.toUpperCase()} company (${analysis.companyAnalysis.employees} employees)
+                                    ${type === 'batch' ? `- ID: ${id}` : ''}
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <strong>Priority:</strong> ${analysis.priority.replace('_', ' ').toUpperCase()} | 
+                                    <strong>Industry:</strong> ${analysis.companyAnalysis.industry}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${analysis.insights.length > 0 ? `
+                            <div class="insights">
+                                <h4>💡 Insights</h4>
+                                ${analysis.insights.map(insight => `<span class="insight-item">${insight}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            showLoading() {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsContent = document.getElementById('resultsContent');
+                
+                resultsContent.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Analyzing leads...</p>
+                    </div>
+                `;
+                
+                resultsSection.style.display = 'block';
+            }
+
+            showError(message) {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsContent = document.getElementById('resultsContent');
+                
+                resultsContent.innerHTML = `<div class="error">❌ ${message}</div>`;
+                resultsSection.style.display = 'block';
+            }
+
+            showSuccess(message) {
+                const resultsSection = document.getElementById('resultsSection');
+                const resultsContent = document.getElementById('resultsContent');
+                
+                resultsContent.innerHTML = `<div class="success">✅ ${message}</div>`;
+                resultsSection.style.display = 'block';
+            }
+        }
+
+        // Initialize the platform when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new SalesIntelligencePlatform();
+        });
+    </script>
+</body>
+</html>
